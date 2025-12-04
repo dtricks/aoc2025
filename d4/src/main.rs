@@ -36,51 +36,45 @@ fn parse_lines(lines: &str) -> Vec<Vec<Pos>> {
     lines.lines().map(parse_line).collect()
 }
 
-fn fewer_than_four_neighbors(input: Vec<Vec<Pos>>) -> Vec<Vec<Pos>> {
+fn fewer_than_four_neighbors(input: &[Vec<Pos>]) -> Vec<Vec<Pos>> {
     use Pos::{Empty as E, Paperroll as P, PaperrollAccessible as PA};
     let mut v = vec![];
     for (y, line) in input.iter().enumerate() {
         let mut v_line = vec![];
         for (x, pos) in line.iter().enumerate() {
             if *pos == P {
-                let left = line.get(x.wrapping_sub(1)).unwrap_or(&E).clone();
-                let right = line.get(x.wrapping_add(1)).unwrap_or(&E).clone();
+                let left = line
+                    .get(x.wrapping_sub(1))
+                    .and_then(|v| Some(*v))
+                    .unwrap_or(E);
+                let right = line
+                    .get(x.wrapping_add(1))
+                    .and_then(|v| Some(*v))
+                    .unwrap_or(E);
                 let up = input
                     .get(y.wrapping_sub(1))
-                    .unwrap_or(&vec![E; line.len()])
-                    .get(x)
-                    .unwrap_or(&E)
-                    .clone();
+                    .and_then(|l| l.get(x).and_then(|v| Some(*v)))
+                    .unwrap_or(E);
                 let down = input
                     .get(y + 1)
-                    .unwrap_or(&vec![E; line.len()])
-                    .get(x)
-                    .unwrap_or(&E)
-                    .clone();
+                    .and_then(|l| l.get(x).and_then(|v| Some(*v)))
+                    .unwrap_or(E);
                 let dl = input
                     .get(y + 1)
-                    .unwrap_or(&vec![E; line.len()])
-                    .get(x.wrapping_sub(1))
-                    .unwrap_or(&E)
-                    .clone();
+                    .and_then(|l| l.get(x.wrapping_sub(1)).and_then(|v| Some(*v)))
+                    .unwrap_or(E);
                 let dr = input
                     .get(y + 1)
-                    .unwrap_or(&vec![E; line.len()])
-                    .get(x + 1)
-                    .unwrap_or(&E)
-                    .clone();
+                    .and_then(|l| l.get(x + 1).and_then(|v| Some(*v)))
+                    .unwrap_or(E);
                 let ur = input
                     .get(y.wrapping_sub(1))
-                    .unwrap_or(&vec![E; line.len()])
-                    .get(x + 1)
-                    .unwrap_or(&E)
-                    .clone();
+                    .and_then(|l| l.get(x + 1).and_then(|v| Some(*v)))
+                    .unwrap_or(E);
                 let ul = input
                     .get(y.wrapping_sub(1))
-                    .unwrap_or(&vec![E; line.len()])
-                    .get(x.wrapping_sub(1))
-                    .unwrap_or(&E)
-                    .clone();
+                    .and_then(|l| l.get(x.wrapping_sub(1)).and_then(|v| Some(*v)))
+                    .unwrap_or(E);
                 let n = left as i32
                     + right as i32
                     + up as i32
@@ -103,7 +97,7 @@ fn fewer_than_four_neighbors(input: Vec<Vec<Pos>>) -> Vec<Vec<Pos>> {
     v
 }
 
-fn count_accessible(input: Vec<Vec<Pos>>) -> u64 {
+fn count_accessible(input: &[Vec<Pos>]) -> u64 {
     input.iter().flatten().fold(0, |acc, &x| {
         let x = if x == Pos::PaperrollAccessible { 1 } else { 0 };
         acc + x
@@ -118,12 +112,12 @@ pub mod part2 {
     use super::Pos::{Empty as E, PaperrollAccessible as PA};
     use super::*;
 
-    pub fn remove_accessible(input: Vec<Vec<Pos>>) -> (u64, Vec<Vec<Pos>>) {
-        let count = count_accessible(input.clone());
+    pub fn remove_accessible(input: &[Vec<Pos>]) -> (u64, Vec<Vec<Pos>>) {
+        let count = count_accessible(input);
         let mut v = vec![];
         for line in input {
             let mut v_line = vec![];
-            for pos in line {
+            for &pos in line {
                 if pos == PA {
                     v_line.push(E);
                 } else {
@@ -135,11 +129,11 @@ pub mod part2 {
         (count, v)
     }
 
-    pub fn add_n_removable(input: Vec<Vec<Pos>>) -> u64 {
-        let mut v = input.clone();
+    pub fn add_n_removable(input: &[Vec<Pos>]) -> u64 {
+        let mut v = input.to_vec();
         let mut removable = 0;
         loop {
-            let (count, removed) = remove_accessible(fewer_than_four_neighbors(v.clone()));
+            let (count, removed) = remove_accessible(&fewer_than_four_neighbors(&v));
             v = removed;
             if count == 0 {
                 return removable;
@@ -176,11 +170,11 @@ mod tests {
     #[test]
     fn test_count_accessible() {
         assert_eq!(
-            count_accessible(fewer_than_four_neighbors(parse_lines(TEST_INPUT1))),
+            count_accessible(&fewer_than_four_neighbors(&parse_lines(TEST_INPUT1))),
             13
         );
         assert_eq!(
-            count_accessible(fewer_than_four_neighbors(parse_lines(TEST_INPUT2))),
+            count_accessible(&fewer_than_four_neighbors(&parse_lines(TEST_INPUT2))),
             1451
         );
     }
@@ -188,11 +182,11 @@ mod tests {
     fn test_count_removed() {
         use super::part2::*;
         assert_eq!(
-            add_n_removable(fewer_than_four_neighbors(parse_lines(TEST_INPUT1))),
+            add_n_removable(&fewer_than_four_neighbors(&parse_lines(TEST_INPUT1))),
             43
         );
         assert_eq!(
-            add_n_removable(fewer_than_four_neighbors(parse_lines(TEST_INPUT2))),
+            add_n_removable(&fewer_than_four_neighbors(&parse_lines(TEST_INPUT2))),
             8701
         );
     }
