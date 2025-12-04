@@ -15,7 +15,7 @@ const TEST_INPUT1: &str = "..@@.@@@@.
 const TEST_INPUT2: &str = include_str!("../input.txt");
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum Pos {
+pub enum Pos {
     Empty,
     Paperroll,
     PaperrollAccessible,
@@ -91,6 +91,8 @@ fn fewer_than_four_neighbors(input: Vec<Vec<Pos>>) -> Vec<Vec<Pos>> {
                     + dr as i32;
                 if n < 4 {
                     v_line.push(PA);
+                } else {
+                    v_line.push(*pos);
                 }
             } else {
                 v_line.push(*pos);
@@ -113,7 +115,7 @@ fn main() {
 }
 
 pub mod part2 {
-    use super::Pos::{Empty as E, Paperroll as P, PaperrollAccessible as PA};
+    use super::Pos::{Empty as E, PaperrollAccessible as PA};
     use super::*;
 
     pub fn remove_accessible(input: Vec<Vec<Pos>>) -> (u64, Vec<Vec<Pos>>) {
@@ -130,16 +132,15 @@ pub mod part2 {
             }
             v.push(v_line);
         }
-        println!("{count}");
         (count, v)
     }
 
     pub fn add_n_removable(input: Vec<Vec<Pos>>) -> u64 {
         let mut v = input.clone();
         let mut removable = 0;
-        dbg!(&v);
         loop {
-            let (count, v) = remove_accessible(v.clone());
+            let (count, removed) = remove_accessible(fewer_than_four_neighbors(v.clone()));
+            v = removed;
             if count == 0 {
                 return removable;
             }
@@ -150,7 +151,7 @@ pub mod part2 {
 
 #[cfg(test)]
 mod tests {
-    use super::part2;
+
     use super::*;
 
     #[test]
@@ -186,14 +187,13 @@ mod tests {
     #[test]
     fn test_count_removed() {
         use super::part2::*;
-        println!("Running part2 test");
         assert_eq!(
             add_n_removable(fewer_than_four_neighbors(parse_lines(TEST_INPUT1))),
             43
         );
         assert_eq!(
             add_n_removable(fewer_than_four_neighbors(parse_lines(TEST_INPUT2))),
-            1451
+            8701
         );
     }
 }
