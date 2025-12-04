@@ -1,5 +1,15 @@
 #![allow(dead_code)]
 
+macro_rules! get_pos {
+    ($input:expr, $y:expr, $x:expr) => {
+        $input
+            .get($y)
+            .and_then(|l| l.get($x))
+            .copied()
+            .unwrap_or(Pos::Empty)
+    };
+}
+
 const TEST_INPUT1: &str = "..@@.@@@@.
 @@@.@.@.@@
 @@@@@.@.@@
@@ -43,46 +53,18 @@ fn fewer_than_four_neighbors(input: &[Vec<Pos>]) -> Vec<Vec<Pos>> {
         let mut v_line = vec![];
         for (x, pos) in line.iter().enumerate() {
             if *pos == P {
-                let left = line
-                    .get(x.wrapping_sub(1))
-                    .and_then(|v| Some(*v))
-                    .unwrap_or(E);
-                let right = line
-                    .get(x.wrapping_add(1))
-                    .and_then(|v| Some(*v))
-                    .unwrap_or(E);
-                let up = input
-                    .get(y.wrapping_sub(1))
-                    .and_then(|l| l.get(x).and_then(|v| Some(*v)))
-                    .unwrap_or(E);
-                let down = input
-                    .get(y + 1)
-                    .and_then(|l| l.get(x).and_then(|v| Some(*v)))
-                    .unwrap_or(E);
-                let dl = input
-                    .get(y + 1)
-                    .and_then(|l| l.get(x.wrapping_sub(1)).and_then(|v| Some(*v)))
-                    .unwrap_or(E);
-                let dr = input
-                    .get(y + 1)
-                    .and_then(|l| l.get(x + 1).and_then(|v| Some(*v)))
-                    .unwrap_or(E);
-                let ur = input
-                    .get(y.wrapping_sub(1))
-                    .and_then(|l| l.get(x + 1).and_then(|v| Some(*v)))
-                    .unwrap_or(E);
-                let ul = input
-                    .get(y.wrapping_sub(1))
-                    .and_then(|l| l.get(x.wrapping_sub(1)).and_then(|v| Some(*v)))
-                    .unwrap_or(E);
-                let n = left as i32
-                    + right as i32
-                    + up as i32
-                    + down as i32
-                    + ul as i32
-                    + ur as i32
-                    + dl as i32
-                    + dr as i32;
+                let left = line.get(x.wrapping_sub(1)).copied().unwrap_or(E);
+                let right = line.get(x.wrapping_add(1)).copied().unwrap_or(E);
+                let up = get_pos!(input, y.wrapping_sub(1), x);
+                let down = get_pos!(input, y.wrapping_add(1), x);
+                let dl = get_pos!(input, y.wrapping_add(1), x.wrapping_sub(1));
+                let dr = get_pos!(input, y.wrapping_add(1), x.wrapping_add(1));
+                let ur = get_pos!(input, y.wrapping_sub(1), x.wrapping_add(1));
+                let ul = get_pos!(input, y.wrapping_sub(1), x.wrapping_sub(1));
+                let n = [left, right, up, down, ul, ur, dl, dr]
+                    .iter()
+                    .map(|&p| if p == Pos::Empty { 0 } else { 1 })
+                    .sum::<i32>();
                 if n < 4 {
                     v_line.push(PA);
                 } else {
