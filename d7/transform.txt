@@ -1,0 +1,29 @@
+vec![vec![E,E,E,E,E,E,E,G,E,E,E,E,E,E,E],
+vec![     E,E,E,E,E,E,E,B,E,E,E,E,E,E,E],
+vec![     E,E,E,E,E,E,B,S,B,E,E,E,E,E,E],
+vec![     E,E,E,E,E,E,B,E,B,E,E,E,E,E,E],
+vec![     E,E,E,E,E,B,S,B,S,B,E,E,E,E,E],
+vec![     E,E,E,E,E,B,E,B,E,B,E,E,E,E,E],
+vec![     E,E,E,E,B,S,B,S,B,S,B,E,E,E,E],
+vec![     E,E,E,E,B,E,B,E,B,E,B,E,E,E,E],
+vec![     E,E,E,B,S,B,S,B,B,B,S,B,E,E,E],
+vec![     E,E,E,B,E,B,E,B,B,B,E,B,E,E,E],
+vec![     E,E,B,S,B,S,B,B,B,S,B,S,B,E,E],
+vec![     E,E,B,E,B,E,B,B,B,E,B,E,B,E,E],
+vec![     E,B,S,B,B,B,S,B,B,E,B,B,S,B,E],
+vec![     E,B,E,B,B,B,E,B,B,E,B,B,E,B,E],
+vec![     B,S,B,S,B,S,B,S,B,S,B,B,B,S,B],
+vec![     B,E,B,E,B,E,B,E,B,E,B,B,B,E,B]
+
+
+    /\
+    lr
+   /\/\
+   l   r
+  /\/\/\
+  1 2 3 4
+
+1: lll
+2: llr,rll
+3: lrr,rrl
+4: rrr
